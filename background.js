@@ -1,84 +1,62 @@
-/**
- * MoeKoe 示例插件 - 后台脚本（Service Worker）
- *
- * 这个文件主要演示三件事：
- * 1. 插件安装时写入默认配置
- * 2. 作为消息中枢，处理 popup/content 的请求
- * 3. 在后台维护一个“最近一次页面上报状态”
- */
-
-const STORAGE_KEY = "helperDemoSettings";
+const STORAGE_KEY = "moekoeCommentsPanelSettings";
 
 const DEFAULT_SETTINGS = {
   enabled: true,
-  badgeText: "示例插件已生效"
+  pageSize: 10,
+  showAlbumComments: true
 };
 
-// 保存内容脚本上报的最新页面信息（仅内存态，重启后清空）
 let latestPageState = {
   title: "",
-  url: "",
-  hasAppRoot: false,
+  route: "",
+  kind: "",
+  entityId: "",
   updatedAt: 0
 };
 
 chrome.runtime.onInstalled.addListener(async () => {
   const saved = await getStorage(STORAGE_KEY);
-  const normalized = normalizeSettings(saved[STORAGE_KEY]);
-
-  // 合并默认值，避免未来新增字段时老配置缺失
   await setStorage({
-    [STORAGE_KEY]: { ...DEFAULT_SETTINGS, ...normalized }
+    [STORAGE_KEY]: normalizeSettings(saved[STORAGE_KEY])
   });
-
-  console.log("[helper-demo] 插件安装完成，默认配置已初始化");
 });
 
 chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
   if (!message || typeof message !== "object") {
-    sendResponse({ ok: false, message: "无效消息" });
+    sendResponse({ ok: false, message: "Invalid message" });
     return;
   }
 
   switch (message.type) {
-    case "helper-demo:get-state":
+    case "comments-panel:get-state":
       handleGetState(sendResponse);
       return true;
-
-    case "helper-demo:save-settings":
+    case "comments-panel:save-settings":
       handleSaveSettings(message.payload, sendResponse);
       return true;
-
-    case "helper-demo:reset-settings":
+    case "comments-panel:reset-settings":
       handleResetSettings(sendResponse);
       return true;
-
-    case "helper-demo:report-page":
+    case "comments-panel:report-page":
       handleReportPage(message.payload, sender, sendResponse);
       return true;
-
     default:
-      sendResponse({ ok: false, message: "未知消息类型" });
+      sendResponse({ ok: false, message: "Unknown message type" });
   }
 });
 
 async function handleGetState(sendResponse) {
   try {
     const saved = await getStorage(STORAGE_KEY);
-    const settings = normalizeSettings(saved[STORAGE_KEY]);
-
     sendResponse({
       ok: true,
       data: {
-        settings,
+        settings: normalizeSettings(saved[STORAGE_KEY]),
         latestPageState
       }
     });
   } catch (error) {
-    sendResponse({
-      ok: false,
-      message: `读取状态失败: ${error.message}`
-    });
+    sendResponse({ ok: false, message: error.message || String(error) });
   }
 }
 
@@ -86,41 +64,28 @@ async function handleSaveSettings(payload, sendResponse) {
   try {
     const settings = normalizeSettings(payload);
     await setStorage({ [STORAGE_KEY]: settings });
-
-    sendResponse({
-      ok: true,
-      data: settings
-    });
+    sendResponse({ ok: true, data: settings });
   } catch (error) {
-    sendResponse({
-      ok: false,
-      message: `保存配置失败: ${error.message}`
-    });
+    sendResponse({ ok: false, message: error.message || String(error) });
   }
 }
 
 async function handleResetSettings(sendResponse) {
   try {
     await setStorage({ [STORAGE_KEY]: { ...DEFAULT_SETTINGS } });
-    sendResponse({
-      ok: true,
-      data: { ...DEFAULT_SETTINGS }
-    });
+    sendResponse({ ok: true, data: { ...DEFAULT_SETTINGS } });
   } catch (error) {
-    sendResponse({
-      ok: false,
-      message: `恢复默认失败: ${error.message}`
-    });
+    sendResponse({ ok: false, message: error.message || String(error) });
   }
 }
 
 function handleReportPage(payload, sender, sendResponse) {
   const pageState = payload && typeof payload === "object" ? payload : {};
-
   latestPageState = {
-    title: String(pageState.title || ""),
-    url: String(pageState.url || ""),
-    hasAppRoot: Boolean(pageState.hasAppRoot),
+    title: typeof pageState.title === "string" ? pageState.title : "",
+    route: typeof pageState.route === "string" ? pageState.route : "",
+    kind: typeof pageState.kind === "string" ? pageState.kind : "",
+    entityId: typeof pageState.entityId === "string" ? pageState.entityId : "",
     updatedAt: Date.now(),
     tabId: typeof sender?.tab?.id === "number" ? sender.tab.id : null
   };
@@ -130,11 +95,14 @@ function handleReportPage(payload, sender, sendResponse) {
 
 function normalizeSettings(raw) {
   const next = raw && typeof raw === "object" ? raw : {};
+  const pageSize = Number(next.pageSize);
+
   return {
     enabled: typeof next.enabled === "boolean" ? next.enabled : DEFAULT_SETTINGS.enabled,
-    badgeText: typeof next.badgeText === "string" && next.badgeText.trim()
-      ? next.badgeText.trim()
-      : DEFAULT_SETTINGS.badgeText
+    pageSize: [10, 20, 30].includes(pageSize) ? pageSize : DEFAULT_SETTINGS.pageSize,
+    showAlbumComments: typeof next.showAlbumComments === "boolean"
+      ? next.showAlbumComments
+      : DEFAULT_SETTINGS.showAlbumComments
   };
 }
 

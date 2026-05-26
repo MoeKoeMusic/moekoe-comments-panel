@@ -3,155 +3,42 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>MoeKoe 示例助手</title>
-  <style>
-    :root {
-      color-scheme: light;
-    }
-
-    * {
-      box-sizing: border-box;
-    }
-
-    body {
-      margin: 0;
-      width: 360px;
-      padding: 14px;
-      font-family: "Segoe UI", "PingFang SC", "Microsoft YaHei", sans-serif;
-      background: #f3f4f6;
-      color: #111827;
-    }
-
-    .panel {
-      background: #fff;
-      border-radius: 12px;
-      padding: 14px;
-      box-shadow: 0 8px 24px rgba(0, 0, 0, 0.08);
-    }
-
-    h1 {
-      margin: 0 0 10px;
-      font-size: 17px;
-    }
-
-    .desc {
-      margin: 0 0 12px;
-      font-size: 12px;
-      line-height: 1.5;
-      color: #4b5563;
-    }
-
-    .section {
-      margin-top: 12px;
-      padding-top: 10px;
-      border-top: 1px solid #e5e7eb;
-    }
-
-    .row {
-      margin-top: 10px;
-    }
-
-    .label {
-      display: block;
-      margin-bottom: 6px;
-      font-size: 13px;
-      font-weight: 600;
-      color: #374151;
-    }
-
-    .input {
-      width: 100%;
-      border: 1px solid #d1d5db;
-      border-radius: 8px;
-      padding: 8px 10px;
-      font-size: 13px;
-      outline: none;
-    }
-
-    .switch {
-      display: flex;
-      align-items: center;
-      gap: 8px;
-      font-size: 13px;
-      color: #1f2937;
-    }
-
-    .page-info {
-      border: 1px solid #e5e7eb;
-      border-radius: 8px;
-      padding: 10px;
-      background: #f9fafb;
-      font-size: 12px;
-      line-height: 1.45;
-      word-break: break-all;
-      color: #374151;
-    }
-
-    .status {
-      min-height: 18px;
-      margin-top: 10px;
-      font-size: 12px;
-      color: #6b7280;
-    }
-
-    .status.success {
-      color: #15803d;
-    }
-
-    .status.error {
-      color: #b91c1c;
-    }
-
-    .actions {
-      margin-top: 12px;
-      display: grid;
-      grid-template-columns: 1fr 1fr;
-      gap: 8px;
-    }
-
-    button {
-      border: none;
-      border-radius: 8px;
-      padding: 9px 10px;
-      cursor: pointer;
-      font-size: 13px;
-    }
-
-    .primary {
-      background: #2563eb;
-      color: #fff;
-    }
-
-    .secondary {
-      background: #e5e7eb;
-      color: #111827;
-    }
-  </style>
+  <title>MoeKoe 评论面板</title>
+  <link rel="stylesheet" href="popup.css">
 </head>
 <body>
   <div class="panel">
-    <h1>MoeKoe 示例助手</h1>
-    <p class="desc">
-      这是一个教学型示例插件：演示「配置存储」「消息通信」「内容脚本注入」的基本写法。
-    </p>
+    <div class="hero">
+      <div>
+        <span class="eyebrow">COMMENT DECK</span>
+        <h1>评论面板</h1>
+        <p class="desc">为 MoeKoe Music 增加歌单/专辑评论区。</p>
+      </div>
+      <div class="dot"></div>
+    </div>
 
     <div class="section">
-      <label class="switch">
+      <div class="switch">
         <input id="enabledCheckbox" type="checkbox">
-        <span>启用页面右上角示例角标</span>
-      </label>
+        <span>启用评论面板</span>
+      </div>
 
-      <div class="row">
-        <label for="badgeTextInput" class="label">角标文案</label>
-        <input id="badgeTextInput" class="input" type="text" maxlength="40" placeholder="请输入角标文案">
+      <div class="field">
+        <label class="label" for="pageSizeSelect">每页评论数</label>
+        <select id="pageSizeSelect">
+          <option value="10">10 条</option>
+          <option value="20">20 条</option>
+          <option value="30">30 条</option>
+        </select>
+      </div>
+
+      <div class="field">
+        <label class="switch">
+          <input id="showAlbumCommentsCheckbox" type="checkbox">
+          <span>专辑详情页也显示评论</span>
+        </label>
       </div>
     </div>
-
-    <div class="section">
-      <div class="label">最近页面状态</div>
-      <div id="pageInfo" class="page-info">正在读取...</div>
-    </div>
-
     <div class="actions">
       <button id="saveButton" class="primary">保存配置</button>
       <button id="resetButton" class="secondary">恢复默认</button>

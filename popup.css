@@ -1,0 +1,221 @@
+:root {
+  color-scheme: light dark;
+  --bg: #f4f0ea;
+  --panel: #fffaf3;
+  --panel-strong: #fff;
+  --border: rgba(133, 77, 44, 0.16);
+  --text: #2b2018;
+  --muted: #7a685a;
+  --accent: #c8673d;
+  --accent-deep: #8f3f23;
+  --shadow: 0 16px 40px rgba(121, 76, 44, 0.16);
+}
+
+@media (prefers-color-scheme: dark) {
+  :root {
+    --bg: #161616;
+    --panel: #1d1d1d;
+    --panel-strong: #252525;
+    --border: rgba(255, 255, 255, 0.08);
+    --text: #ececec;
+    --muted: #a0a0a0;
+    --accent: #b86222;
+    --accent-deep: #f0c39d;
+    --shadow: 0 16px 40px rgba(0, 0, 0, 0.36);
+  }
+}
+
+* {
+  box-sizing: border-box;
+}
+
+body {
+  margin: 0;
+  width: 368px;
+  padding: 16px;
+  font-family: "Segoe UI", "PingFang SC", "Microsoft YaHei", sans-serif;
+  background:
+    radial-gradient(circle at top right, rgba(200, 103, 61, 0.18), transparent 34%),
+    linear-gradient(180deg, #f9f2e8 0%, var(--bg) 100%);
+  color: var(--text);
+}
+
+@media (prefers-color-scheme: dark) {
+  body {
+    background:
+      radial-gradient(circle at top right, rgba(184, 98, 34, 0.18), transparent 34%),
+      linear-gradient(180deg, #202020 0%, var(--bg) 100%);
+  }
+}
+
+.panel {
+  border: 1px solid var(--border);
+  border-radius: 20px;
+  padding: 16px;
+  background: rgba(255, 250, 243, 0.92);
+  backdrop-filter: blur(12px);
+  box-shadow: var(--shadow);
+}
+
+@media (prefers-color-scheme: dark) {
+  .panel {
+    background: rgba(29, 29, 29, 0.94);
+  }
+}
+
+.hero {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 12px;
+  margin-bottom: 14px;
+}
+
+.eyebrow {
+  display: inline-flex;
+  padding: 4px 10px;
+  border-radius: 999px;
+  background: rgba(200, 103, 61, 0.12);
+  color: var(--accent-deep);
+  font-size: 11px;
+  letter-spacing: 0.08em;
+}
+
+@media (prefers-color-scheme: dark) {
+  .eyebrow {
+    background: rgba(184, 98, 34, 0.18);
+  }
+}
+
+h1 {
+  margin: 8px 0 6px;
+  font-size: 19px;
+  line-height: 1.15;
+}
+
+.desc {
+  margin: 0;
+  color: var(--muted);
+  font-size: 12px;
+  line-height: 1.55;
+}
+
+.dot {
+  width: 12px;
+  height: 12px;
+  border-radius: 50%;
+  background: linear-gradient(135deg, #f3a565 0%, var(--accent) 100%);
+  box-shadow: 0 0 0 8px rgba(200, 103, 61, 0.08);
+  flex-shrink: 0;
+  margin-top: 8px;
+}
+
+@media (prefers-color-scheme: dark) {
+  .dot {
+    box-shadow: 0 0 0 8px rgba(184, 98, 34, 0.12);
+  }
+}
+
+.section {
+  margin-top: 14px;
+  padding-top: 14px;
+  border-top: 1px solid rgba(133, 77, 44, 0.12);
+}
+
+.field {
+  margin-top: 10px;
+}
+
+.label {
+  display: block;
+  margin-bottom: 6px;
+  font-size: 13px;
+  font-weight: 600;
+}
+
+.switch {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  min-height: 22px;
+  font-size: 13px;
+}
+
+select {
+  width: 100%;
+  border: 1px solid rgba(133, 77, 44, 0.18);
+  border-radius: 12px;
+  padding: 10px 12px;
+  background: var(--panel-strong);
+  color: var(--text);
+  font-size: 13px;
+  outline: none;
+}
+
+@media (prefers-color-scheme: dark) {
+  select {
+    border-color: rgba(255, 255, 255, 0.08);
+    background: var(--panel-strong);
+  }
+}
+
+.status {
+  min-height: 18px;
+  margin-top: 10px;
+  font-size: 12px;
+  color: var(--muted);
+}
+
+.status.success {
+  color: #1d7c4f;
+}
+
+.status.error {
+  color: #b24732;
+}
+
+.actions {
+  margin-top: 14px;
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 10px;
+}
+
+button {
+  border: none;
+  border-radius: 12px;
+  padding: 11px 12px;
+  cursor: pointer;
+  font-size: 13px;
+  transition: transform 0.18s ease, box-shadow 0.18s ease, opacity 0.18s ease;
+}
+
+button:hover {
+  transform: translateY(-1px);
+}
+
+.primary {
+  background: linear-gradient(135deg, #d87448 0%, #b9522d 100%);
+  color: #fff;
+  box-shadow: 0 12px 24px rgba(185, 82, 45, 0.22);
+}
+
+@media (prefers-color-scheme: dark) {
+  .primary {
+    background: linear-gradient(135deg, #b86222 0%, #8c4b7b 100%);
+    box-shadow: 0 12px 24px rgba(0, 0, 0, 0.28);
+  }
+}
+
+.secondary {
+  background: rgba(255, 255, 255, 0.8);
+  color: var(--text);
+  border: 1px solid rgba(133, 77, 44, 0.14);
+}
+
+@media (prefers-color-scheme: dark) {
+  .secondary {
+    background: rgba(42, 42, 42, 0.92);
+    border-color: rgba(255, 255, 255, 0.08);
+  }
+}
