@@ -24,17 +24,19 @@ moekoe-comments-panel/
 
 ## 安装方式
 
-### 方式一：手动安装
+### 方式一：软件内自动安装（推荐）
 
-1. 将插件目录放入 MoeKoe Music 插件目录 `plugins/extensions/`
-2. 打开 MoeKoe Music 的插件管理页
-3. 点击刷新插件，或重启主程序
+1. 打开 `设置 -> 插件管理`
+2. 切换到 `插件市场`
+3. 搜索插件并点击 `安装`
+4. 安装完成后刷新插件列表或重启应用
 
-### 方式二：自动安装（插件市场）
+### 方式二：GitHub 手动下载安装
 
-1. 把插件发布到 [插件市场源](https://github.com/MoeKoeMusic/moekoe-comments-panel)
-2. 在 MoeKoe Music 插件管理中进入“插件市场”
-3. 点击安装，程序会自动下载并安装 zip 包
+1. 从 GitHub 下载本项目源码（`Code -> Download ZIP`）
+2. 安装方式二选一：
+   - 复制解压后的文件夹到 MoeKoe 插件目录（`plugins/extensions`），然后在插件管理中刷新
+   - 将该下载的 `zip` 文件，在 `设置 -> 插件管理 -> 安装插件` 中选择 zip 安装
 
 ## 配置
 
