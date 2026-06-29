@@ -3,7 +3,8 @@
 
   const STORAGE_KEY = "moekoeCommentsPanelSettings";
   const PANEL_ID = "moekoe-comments-panel-root";
-  const BUTTON_ID = "moekoe-comments-panel-jump";
+  const TAB_ID = "moekoe-comments-panel-tabs";
+  const LEGACY_BUTTON_ID = "moekoe-comments-panel-jump";
   const DEFAULT_API_BASE_URL = "http://127.0.0.1:6521";
   const DEFAULT_SETTINGS = {
     enabled: true,
@@ -26,7 +27,8 @@
     isLoadingMore: false,
     errorMessage: "",
     requestSerial: 0,
-    abortController: null
+    abortController: null,
+    activeTab: "songs"
   };
 
   let syncTimer = 0;
@@ -78,8 +80,9 @@
         return;
       }
 
-      ensureJumpButton(detailPage);
       ensurePanel(detailPage);
+      ensureTabs(detailPage);
+      removeLegacyJumpButton();
 
       if (!state.panel?.innerHTML.trim()) {
         render();
@@ -120,8 +123,9 @@
     }
 
     pendingSyncRetries = 0;
-    ensureJumpButton(detailPage);
     ensurePanel(detailPage);
+    ensureTabs(detailPage);
+    removeLegacyJumpButton();
 
     if (forceReload || context.routeKey !== state.routeKey) {
       state.routeKey = context.routeKey;
@@ -170,39 +174,10 @@
     return null;
   }
 
-  function ensureJumpButton(detailPage) {
-    const actions = detailPage.querySelector(".actions");
-    if (!actions) return;
-
-    let button = document.getElementById(BUTTON_ID);
-    if (!button) {
-      button = document.createElement("button");
-      button.id = BUTTON_ID;
-      button.type = "button";
-      button.className = "mkc-comment-jump-btn";
-      button.textContent = "看评论";
-      button.addEventListener("click", handleJumpClick);
-    }
-
-    if (button.parentElement !== actions) {
-      actions.appendChild(button);
-    }
-  }
-
-  function handleJumpClick(event) {
-    event.preventDefault();
-    event.stopPropagation();
-
-    const panel = document.getElementById(PANEL_ID);
-    if (!panel) return;
-
-    panel.scrollIntoView({
-      behavior: "smooth",
-      block: "start"
-    });
-  }
-
   function ensurePanel(detailPage) {
+    const trackContainer = detailPage.querySelector(".track-list-container");
+    if (!trackContainer) return;
+
     let panel = document.getElementById(PANEL_ID);
     if (!panel) {
       panel = document.createElement("section");
@@ -210,16 +185,91 @@
       panel.addEventListener("click", handlePanelClick);
     }
 
-    const noteContainer = detailPage.querySelector(".note-container");
-    if (panel.parentElement !== detailPage) {
-      if (noteContainer) {
-        detailPage.insertBefore(panel, noteContainer);
+    if (panel.parentElement !== trackContainer) {
+      const listHeader = trackContainer.querySelector(".track-list-header");
+      if (listHeader?.nextSibling) {
+        trackContainer.insertBefore(panel, listHeader.nextSibling);
       } else {
-        detailPage.appendChild(panel);
+        trackContainer.appendChild(panel);
       }
     }
 
     state.panel = panel;
+    applyTabState();
+  }
+
+  function ensureTabs(detailPage) {
+    const trackContainer = detailPage.querySelector(".track-list-container");
+    const listHeader = trackContainer?.querySelector(".track-list-header");
+    if (!trackContainer || !listHeader) return;
+
+    let tabs = document.getElementById(TAB_ID);
+    if (!tabs) {
+      tabs = document.createElement("div");
+      tabs.id = TAB_ID;
+      tabs.className = "mkc-track-tabs";
+      tabs.innerHTML = `
+        <button type="button" data-mkc-tab="songs">歌曲列表</button>
+        <button type="button" data-mkc-tab="comments">评论</button>
+      `;
+      tabs.addEventListener("click", handleTabClick);
+    }
+
+    if (tabs.parentElement !== listHeader) {
+      const actions = listHeader.querySelector(".track-list-actions");
+      if (actions) {
+        listHeader.insertBefore(tabs, actions);
+      } else {
+        listHeader.appendChild(tabs);
+      }
+    }
+
+    applyTabState();
+  }
+
+  function handleTabClick(event) {
+    const button = event.target.closest("[data-mkc-tab]");
+    if (!button) return;
+
+    const nextTab = button.getAttribute("data-mkc-tab");
+    if (!["songs", "comments"].includes(nextTab) || nextTab === state.activeTab) return;
+
+    event.preventDefault();
+    event.stopPropagation();
+
+    state.activeTab = nextTab;
+    applyTabState();
+
+    if (nextTab === "comments" && !state.currentPage && !state.isLoading && !state.isLoadingMore) {
+      loadComments(1, true);
+    }
+  }
+
+  function applyTabState() {
+    const isCommentsTab = state.activeTab === "comments";
+    const trackContainer = document.querySelector(".detail-page .track-list-container");
+    if (trackContainer) {
+      trackContainer.classList.toggle("mkc-comments-tab-active", isCommentsTab);
+    }
+
+    const panel = document.getElementById(PANEL_ID);
+    if (panel) {
+      panel.classList.toggle("is-active", isCommentsTab);
+    }
+
+    const tabs = document.getElementById(TAB_ID);
+    if (tabs) {
+      tabs.querySelectorAll("[data-mkc-tab]").forEach((button) => {
+        const isActive = button.getAttribute("data-mkc-tab") === state.activeTab;
+        button.classList.toggle("is-active", isActive);
+        button.setAttribute("aria-selected", String(isActive));
+      });
+    }
+  }
+
+  function removeLegacyJumpButton() {
+    const button = document.getElementById(LEGACY_BUTTON_ID);
+    if (button) button.remove();
   }
 
   function handlePanelClick(event) {
@@ -250,10 +300,18 @@
     const panel = document.getElementById(PANEL_ID);
     if (panel) panel.remove();
 
-    const button = document.getElementById(BUTTON_ID);
-    if (button) button.remove();
+    const tabs = document.getElementById(TAB_ID);
+    if (tabs) tabs.remove();
+
+    removeLegacyJumpButton();
+
+    const trackContainer = document.querySelector(".detail-page .track-list-container");
+    if (trackContainer) {
+      trackContainer.classList.remove("mkc-comments-tab-active");
+    }
 
     state.panel = null;
+    state.activeTab = "songs";
   }
 
   function resetData() {
@@ -265,6 +323,7 @@
     state.errorMessage = "";
     state.isLoading = false;
     state.isLoadingMore = false;
+    state.activeTab = "songs";
   }
 
   async function loadComments(page, replace) {
@@ -390,6 +449,8 @@
 
   function render() {
     if (!state.panel) return;
+
+    applyTabState();
 
     const loadMoreDisabled = state.isLoading ||
       state.isLoadingMore ||

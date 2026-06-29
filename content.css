@@ -1,6 +1,61 @@
 #moekoe-comments-panel-root {
   position: relative;
-  margin-top: 28px;
+  display: none;
+  margin-top: 14px;
+}
+
+#moekoe-comments-panel-root.is-active {
+  display: block;
+}
+
+#moekoe-comments-panel-tabs {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;    
+  margin-left: 200px;
+  position: absolute;
+  padding: 3px;
+  border: 1px solid var(--secondary-color);
+  border-radius: 7px;
+  background: rgba(255, 255, 255, 0.72);
+  flex-shrink: 0;
+}
+
+#moekoe-comments-panel-tabs button {
+  min-width: 72px;
+  height: 28px;
+  padding: 0 12px;
+  border: none;
+  border-radius: 5px;
+  background: transparent;
+  color: var(--text-color);
+  font-size: 13px;
+  cursor: pointer;
+  transition: background-color 0.18s ease, color 0.18s ease;
+}
+
+#moekoe-comments-panel-tabs button:hover:not(.is-active) {
+  background: rgba(var(--primary-color-rgb), 0.08);
+}
+
+#moekoe-comments-panel-tabs button.is-active {
+  background: var(--primary-color);
+  color: #fff;
+}
+
+.track-list-container.mkc-comments-tab-active > .track-list-header-row,
+.track-list-container.mkc-comments-tab-active > .search-loading-overlay,
+.track-list-container.mkc-comments-tab-active > .track-list {
+  display: none !important;
+}
+
+.track-list-container.mkc-comments-tab-active > .track-list-header {
+  justify-content: flex-start;
+  gap: 16px;
+}
+
+.track-list-container.mkc-comments-tab-active > .track-list-header .track-list-actions {
+  display: none;
 }
 
 #moekoe-comments-panel-root .mkc-shell {
@@ -222,21 +277,6 @@
   box-shadow: none;
 }
 
-.mkc-comment-jump-btn {
-  border: 1px solid var(--secondary-color);
-  background: rgba(255, 255, 255, 0.72);
-  color: var(--text-color);
-  padding: 10px 16px;
-  border-radius: 5px;
-  cursor: pointer;
-  transition: filter 0.18s ease, background-color 0.18s ease;
-}
-
-.mkc-comment-jump-btn:hover {
-  filter: brightness(1.03);
-  background: rgba(var(--primary-color-rgb), 0.08);
-}
-
 html.dark #moekoe-comments-panel-root .mkc-shell {
   border-color: rgba(255, 255, 255, 0.08);
   background:
@@ -313,14 +353,9 @@ html.dark #moekoe-comments-panel-root .mkc-load-more {
   box-shadow: 0 12px 26px rgba(0, 0, 0, 0.28);
 }
 
-html.dark .mkc-comment-jump-btn {
+html.dark #moekoe-comments-panel-tabs {
   border-color: #373434;
   background: #2a2a2a;
-  color: #e1e1e1;
-}
-
-html.dark .mkc-comment-jump-btn:hover {
-  background: #363636;
 }
 
 #moekoe-comments-panel-root .mkc-skeleton-line {
@@ -367,8 +402,17 @@ html.dark #moekoe-comments-panel-root .mkc-skeleton-line {
     align-items: stretch;
   }
 
-  #moekoe-comments-panel-root .mkc-load-more,
-  .mkc-comment-jump-btn {
+  #moekoe-comments-panel-root .mkc-load-more {
     width: 100%;
+  }
+
+  #moekoe-comments-panel-tabs {
+    order: 3;
+    width: 100%;
+    margin-left: 0;
+  }
+
+  #moekoe-comments-panel-tabs button {
+    flex: 1;
   }
 }
